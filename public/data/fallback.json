@@ -1,0 +1,86 @@
+{
+  "items": [
+    {
+      "id": "fb001",
+      "title": "Ströer meldet starkes Q1-Ergebnis – Digitalumsatz wächst um 18%",
+      "source": "Ströer Investor Relations",
+      "sourceType": "official",
+      "url": "https://www.stroeer.com/investor-relations/news-events/pressemitteilungen/",
+      "published_at": "2025-04-15T10:00:00.000Z",
+      "category": "Unternehmensnews",
+      "summary": "Ströer SE & Co. KGaA gibt bekannt, dass die Umsatzerlöse im ersten Quartal 2025 gegenüber dem Vorjahr deutlich gestiegen sind. Der Bereich Digital Out-of-Home zeigt besonders starke Zuwächse.",
+      "priority": 1,
+      "is_rumor": false,
+      "fetched_at": "2025-04-15T10:05:00.000Z"
+    },
+    {
+      "id": "fb002",
+      "title": "I Squared Capital und Blackstone sollen Interesse an Ströer-Übernahme haben",
+      "source": "manager magazin",
+      "sourceType": "rumor",
+      "url": "https://www.manager-magazin.de/unternehmen/",
+      "published_at": "2025-04-10T08:30:00.000Z",
+      "category": "Übernahme / Gerüchte",
+      "summary": "Laut Informationen aus Finanzkreisen sollen die Infrastrukturfonds I Squared Capital und Blackstone Interesse an einer Übernahme des Außenwerbers Ströer gezeigt haben. Beide Unternehmen wollten sich nicht äußern.",
+      "priority": 1,
+      "is_rumor": true,
+      "fetched_at": "2025-04-10T08:35:00.000Z"
+    },
+    {
+      "id": "fb003",
+      "title": "DOOH-Investitionen in Deutschland erreichen Rekordhoch",
+      "source": "Horizont",
+      "sourceType": "industry",
+      "url": "https://www.horizont.net/",
+      "published_at": "2025-04-12T09:00:00.000Z",
+      "category": "OOH / DOOH",
+      "summary": "Der deutsche Markt für digitale Außenwerbung wächst schneller als erwartet. Branchenführer wie Ströer profitieren besonders von der steigenden Nachfrage nach programmatisch buchbaren Werbeflächen.",
+      "priority": 2,
+      "is_rumor": false,
+      "fetched_at": "2025-04-12T09:05:00.000Z"
+    },
+    {
+      "id": "fb004",
+      "title": "Ströer-Aktie (SAX) unter Druck – Analysten senken Kursziel",
+      "source": "finanzen.net",
+      "sourceType": "financial",
+      "url": "https://www.finanzen.net/aktie/stroeer",
+      "published_at": "2025-04-11T14:00:00.000Z",
+      "category": "Aktie / Markt",
+      "summary": "Mehrere Analysehäuser haben ihre Kursziele für Ströer SE nach einem schwächeren Quartalsbericht leicht nach unten korrigiert. Die Aktie notiert aktuell bei rund 48 Euro.",
+      "priority": 2,
+      "is_rumor": false,
+      "fetched_at": "2025-04-11T14:05:00.000Z"
+    },
+    {
+      "id": "fb005",
+      "title": "Ströer sucht Head of AI – Stellenausschreibung signalisiert strategischen Fokus",
+      "source": "Ströer Karriere",
+      "sourceType": "jobs",
+      "url": "https://www.stroeer.com/karriere/",
+      "published_at": "2025-04-08T10:00:00.000Z",
+      "category": "Jobs / Kultur",
+      "summary": "Ströer hat eine Stellenausschreibung für eine neu geschaffene Position im Bereich Artificial Intelligence veröffentlicht. Die Rolle soll KI-Initiativen im Unternehmen koordinieren.",
+      "priority": 3,
+      "is_rumor": false,
+      "fetched_at": "2025-04-08T10:05:00.000Z"
+    },
+    {
+      "id": "fb006",
+      "title": "Ströer erweitert programmatisches DOOH-Netzwerk in Großstädten",
+      "source": "W&V",
+      "sourceType": "industry",
+      "url": "https://www.wuv.de/",
+      "published_at": "2025-04-05T11:00:00.000Z",
+      "category": "OOH / DOOH",
+      "summary": "Ströer baut sein Netzwerk an digitalen Außenwerbeflächen in den Top-7-Städten aus. Neue Standorte in Bahnhöfen und Shopping-Centern sollen die Reichweite im Q2 deutlich erhöhen.",
+      "priority": 2,
+      "is_rumor": false,
+      "fetched_at": "2025-04-05T11:05:00.000Z"
+    }
+  ],
+  "fetchedAt": "2025-04-15T10:00:00.000Z",
+  "totalSources": 13,
+  "successfulSources": 8,
+  "note": "Fallback-Daten – werden durch Live-Fetch ersetzt sobald verfügbar"
+}

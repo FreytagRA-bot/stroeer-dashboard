@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Ströer" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Ströer Intelligence</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0a0a0f;
+      --bg-card:     #111118;
+      --bg-card2:    #17171f;
+      --border:      rgba(255,255,255,0.07);
+      --border-mid:  rgba(255,255,255,0.12);
+      --text-1:      #f0efe8;
+      --text-2:      #8a8a9a;
+      --text-3:      #555568;
+
+      --amber:       #f59e0b;
+      --amber-dim:   rgba(245,158,11,0.12);
+      --blue:        #60a5fa;
+      --blue-dim:    rgba(96,165,250,0.10);
+      --violet:      #a78bfa;
+      --violet-dim:  rgba(167,139,250,0.10);
+      --emerald:     #34d399;
+      --emerald-dim: rgba(52,211,153,0.10);
+      --rose:        #fb7185;
+      --rose-dim:    rgba(251,113,133,0.10);
+
+      --radius:      10px;
+      --safe-top:    env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100dvh;
+      padding-bottom: calc(80px + var(--safe-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── STICKY HEADER ────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: calc(var(--safe-top) + 12px) 16px 12px;
+      background: rgba(10, 10, 15, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+      color: var(--text-1);
+      line-height: 1;
+    }
+
+    .wordmark span {
+      color: var(--amber);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 6px var(--emerald);
+      flex-shrink: 0;
+    }
+    .status-dot.stale { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+    .status-dot.error { background: var(--rose); box-shadow: 0 0 6px var(--rose); }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-mid);
+      background: var(--bg-card2);
+      color: var(--text-2);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      font-size: 16px;
+    }
+    .refresh-btn:active { color: var(--amber); border-color: var(--amber); }
+    .refresh-btn.spinning { animation: spin 1s linear infinite; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SIGNAL BAR ───────────────────────────────────────────── */
+    .signal-bar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .signal-bar::-webkit-scrollbar { display: none; }
+
+    .signal-pill {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .signal-pill.active {
+      border-color: var(--amber);
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+    .signal-pill.takeover  { --c: var(--amber);   --d: var(--amber-dim); }
+    .signal-pill.company   { --c: var(--blue);    --d: var(--blue-dim); }
+    .signal-pill.oohdooh   { --c: var(--violet);  --d: var(--violet-dim); }
+    .signal-pill.market    { --c: var(--emerald); --d: var(--emerald-dim); }
+    .signal-pill.jobs      { --c: var(--rose);    --d: var(--rose-dim); }
+    .signal-pill[data-cat="all"] { --c: var(--text-2); --d: rgba(255,255,255,0.05); }
+
+    .signal-pill.active {
+      border-color: var(--c);
+      background: var(--d);
+      color: var(--c);
+    }
+    .signal-pill:not(.active) {
+      color: var(--text-3);
+      background: transparent;
+      border-color: var(--border);
+    }
+
+    .pill-count {
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 1px 5px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+    }
+
+    /* ── MAIN CONTENT ─────────────────────────────────────────── */
+    main {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── LAST UPDATED ─────────────────────────────────────────── */
+    .update-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .update-label {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .update-time {
+      font-size: 11px;
+      color: var(--text-2);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── TOP SIGNALS ──────────────────────────────────────────── */
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      margin-bottom: 10px;
+    }
+
+    .top-signals-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .signal-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .signal-card:active { border-color: var(--border-mid); }
+
+    .signal-card.is-rumor {
+      border-left: 2px solid var(--amber);
+      border-left-width: 3px;
+    }
+
+    .signal-icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .signal-content { flex: 1; min-width: 0; }
+
+    .signal-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--text-1);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .signal-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+
+    .signal-source {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .signal-date {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .rumor-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--amber-dim);
+      color: var(--amber);
+      border: 1px solid rgba(245,158,11,0.25);
+      flex-shrink: 0;
+    }
+
+    .cat-badge {
+      font-size: 9px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .cat-badge.takeover  { background: var(--amber-dim);   color: var(--amber);   }
+    .cat-badge.company   { background: var(--blue-dim);    color: var(--blue);    }
+    .cat-badge.oohdooh   { background: var(--violet-dim);  color: var(--violet);  }
+    .cat-badge.market    { background: var(--emerald-dim); color: var(--emerald); }
+    .cat-badge.jobs      { background: var(--rose-dim);    color: var(--rose);    }
+
+    /* ── NEWS CLUSTERS ────────────────────────────────────────── */
+    .cluster {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cluster-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+
+    .cluster-icon { font-size: 14px; }
+
+    .cluster-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .cluster-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .cluster-count {
+      font-size: 10px;
+      color: var(--text-3);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── NEWS ITEM ────────────────────────────────────────────── */
+    .news-item {
+      display: block;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+
+    .news-item:active { border-color: var(--border-mid); }
+
+    .news-item.is-rumor {
+      border-left: 3px solid var(--amber);
+    }
+
+    .news-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .news-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--text-1);
+      flex: 1;
+    }
+
+    .news-summary {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text-2);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .news-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .news-source {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .dot-sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-3);
+      flex-shrink: 0;
+    }
+
+    .news-date {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .arrow-icon {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-left: auto;
+    }
+
+    /* ── EMPTY STATE ─────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    /* ── LOADING ─────────────────────────────────────────────── */
+    .loading-state {
+      padding: 48px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--amber);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    /* ── SKELETON ────────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-card2) 25%, rgba(255,255,255,0.04) 50%, var(--bg-card2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── ERROR TOAST ─────────────────────────────────────────── */
+    .error-banner {
+      display: none;
+      margin: 0 16px;
+      padding: 10px 14px;
+      background: rgba(251,113,133,0.08);
+      border: 1px solid rgba(251,113,133,0.2);
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--rose);
+    }
+    .error-banner.visible { display: block; }
+
+    /* ── SOURCE TYPE INDICATOR ───────────────────────────────── */
+    .source-type-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .source-type-dot.official  { background: var(--blue); }
+    .source-type-dot.industry  { background: var(--violet); }
+    .source-type-dot.financial { background: var(--emerald); }
+    .source-type-dot.jobs      { background: var(--rose); }
+    .source-type-dot.rumor     { background: var(--amber); }
+
+    /* ── BOTTOM NAV ───────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 0 calc(8px + var(--safe-bottom));
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      z-index: 90;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 16px;
+      color: var(--text-3);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      border: none;
+      background: none;
+    }
+
+    .nav-btn.active { color: var(--amber); }
+
+    .nav-icon { font-size: 18px; line-height: 1; }
+
+    /* ── UTILITIES ───────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── DATA SOURCE INFO ────────────────────────────────────── */
+    .data-note {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-3);
+      padding: 8px 0 4px;
+      font-family: 'DM Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ──────────────────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="wordmark">Ströer<span>.</span>Intelligence</div>
+      <div class="header-meta">
+        <div class="status-dot" id="statusDot"></div>
+        <button class="refresh-btn" id="refreshBtn" aria-label="Aktualisieren">↻</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── SIGNAL PILLS / NAVIGATION ───────────────────── -->
+  <div class="signal-bar" id="filterBar">
+    <div class="signal-pill active" data-cat="all">Alle <span class="pill-count" id="countAll">0</span></div>
+    <div class="signal-pill takeover" data-cat="Übernahme / Gerüchte">⚡ Übernahme <span class="pill-count" id="countTakeover">0</span></div>
+    <div class="signal-pill company" data-cat="Unternehmensnews">🏢 Unternehmen <span class="pill-count" id="countCompany">0</span></div>
+    <div class="signal-pill oohdooh" data-cat="OOH / DOOH">📺 OOH/DOOH <span class="pill-count" id="countOOH">0</span></div>
+    <div class="signal-pill market" data-cat="Aktie / Markt">📈 Aktie <span class="pill-count" id="countMarket">0</span></div>
+    <div class="signal-pill jobs" data-cat="Jobs / Kultur">👥 Jobs <span class="pill-count" id="countJobs">0</span></div>
+  </div>
+
+  <!-- ── ERROR BANNER ─────────────────────────────────── -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- ── MAIN ────────────────────────────────────────── -->
+  <main id="mainContent">
+    <!-- Loading state -->
+    <div class="loading-state" id="loadingState">
+      <div class="loader"></div>
+      <div class="loading-text">Lade aktuelle News…</div>
+    </div>
+  </main>
+
+  <!-- ── BOTTOM NAV ───────────────────────────────────── -->
+  <nav>
+    <button class="nav-btn active" data-view="news">
+      <span class="nav-icon">📰</span>News
+    </button>
+    <button class="nav-btn" data-view="top">
+      <span class="nav-icon">⚡</span>Top-Signale
+    </button>
+    <button class="nav-btn" data-view="status">
+      <span class="nav-icon">⚙️</span>Status
+    </button>
+  </nav>
+
+  <script>
+    // ── STATE ──────────────────────────────────────────────────
+    const state = {
+      items: [],
+      fetchedAt: null,
+      activeFilter: 'all',
+      activeView: 'news',
+      dataSource: 'unknown',
+      loading: true,
+      error: null,
+    };
+
+    // ── CATEGORY MAP ───────────────────────────────────────────
+    const catMap = {
+      'Übernahme / Gerüchte': 'takeover',
+      'Unternehmensnews': 'company',
+      'OOH / DOOH': 'oohdooh',
+      'Aktie / Markt': 'market',
+      'Jobs / Kultur': 'jobs',
+    };
+
+    const catIcons = {
+      'Übernahme / Gerüchte': '⚡',
+      'Unternehmensnews': '🏢',
+      'OOH / DOOH': '📺',
+      'Aktie / Markt': '📈',
+      'Jobs / Kultur': '👥',
+    };
+
+    // ── DOM REFS ───────────────────────────────────────────────
+    const mainContent  = document.getElementById('mainContent');
+    const loadingState = document.getElementById('loadingState');
+    const errorBanner  = document.getElementById('errorBanner');
+    const statusDot    = document.getElementById('statusDot');
+    const refreshBtn   = document.getElementById('refreshBtn');
+    const filterBar    = document.getElementById('filterBar');
+
+    // ── DATE FORMATTER ─────────────────────────────────────────
+    function formatDate(isoString) {
+      try {
+        const d = new Date(isoString);
+        const now = new Date();
+        const diffMs = now - d;
+        const diffH = Math.floor(diffMs / 3600000);
+        const diffD = Math.floor(diffMs / 86400000);
+
+        if (diffH < 1) return 'Gerade eben';
+        if (diffH < 24) return `vor ${diffH}h`;
+        if (diffD === 1) return 'Gestern';
+        if (diffD < 7) return `vor ${diffD}d`;
+        return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+      } catch {
+        return '';
+      }
+    }
+
+    function formatDateFull(isoString) {
+      try {
+        return new Date(isoString).toLocaleString('de-DE', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+          timeZone: 'Europe/Berlin',
+        }) + ' Uhr';
+      } catch { return isoString; }
+    }
+
+    // ── FETCH NEWS ─────────────────────────────────────────────
+    async function fetchNews(force = false) {
+      state.loading = true;
+      state.error = null;
+      refreshBtn.classList.add('spinning');
+      renderLoading();
+
+      try {
+        const url = force
+          ? `/api/news?t=${Date.now()}`
+          : '/api/news';
+
+        const res = await fetch(url, {
+          signal: AbortSignal.timeout(15000),
+          headers: { 'Accept': 'application/json' },
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        state.items = data.items || [];
+        state.fetchedAt = data.fetchedAt;
+        state.dataSource = data.source || 'unknown';
+
+        if (data.warning) {
+          showError(`Hinweis: ${data.warning}`, 'warn');
+        }
+
+        updateCounts();
+        render();
+
+      } catch (err) {
+        state.error = err.message;
+        showError(`Fehler beim Laden: ${err.message}`);
+        // Zeige leeren State trotzdem
+        if (state.items.length === 0) {
+          loadFallback();
+        } else {
+          render();
+        }
+      } finally {
+        state.loading = false;
+        refreshBtn.classList.remove('spinning');
+      }
+    }
+
+    // ── FALLBACK LADEN ─────────────────────────────────────────
+    async function loadFallback() {
+      try {
+        const res = await fetch('/data/fallback.json');
+        const data = await res.json();
+        state.items = data.items || [];
+        state.fetchedAt = data.fetchedAt;
+        state.dataSource = 'fallback';
+        updateCounts();
+        render();
+      } catch {
+        renderEmpty();
+      }
+    }
+
+    // ── UPDATE PILL COUNTS ─────────────────────────────────────
+    function updateCounts() {
+      const counts = {};
+      for (const item of state.items) {
+        counts[item.category] = (counts[item.category] || 0) + 1;
+      }
+
+      document.getElementById('countAll').textContent = state.items.length;
+      document.getElementById('countTakeover').textContent = counts['Übernahme / Gerüchte'] || 0;
+      document.getElementById('countCompany').textContent  = counts['Unternehmensnews'] || 0;
+      document.getElementById('countOOH').textContent     = counts['OOH / DOOH'] || 0;
+      document.getElementById('countMarket').textContent  = counts['Aktie / Markt'] || 0;
+      document.getElementById('countJobs').textContent    = counts['Jobs / Kultur'] || 0;
+
+      // Status dot
+      if (state.dataSource === 'fresh' || state.dataSource === 'cache') {
+        statusDot.className = 'status-dot';
+      } else if (state.dataSource === 'stale') {
+        statusDot.className = 'status-dot stale';
+      } else {
+        statusDot.className = 'status-dot error';
+      }
+    }
+
+    // ── FILTER ITEMS ───────────────────────────────────────────
+    function filteredItems() {
+      if (state.activeFilter === 'all') return state.items;
+      return state.items.filter(i => i.category === state.activeFilter);
+    }
+
+    // ── NEWS ITEM HTML ─────────────────────────────────────────
+    function newsItemHTML(item) {
+      const catClass = catMap[item.category] || 'company';
+      const isRumor = item.is_rumor;
+
+      return `
+        <a href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer"
+           class="news-item ${isRumor ? 'is-rumor' : ''} fade-in">
+          <div class="news-item-header">
+            <div class="news-title">${escHtml(item.title)}</div>
+            ${isRumor ? '<span class="rumor-badge">Gerücht</span>' : ''}
+          </div>
+          ${item.summary ? `<div class="news-summary">${escHtml(item.summary)}</div>` : ''}
+          <div class="news-footer">
+            <div class="source-type-dot ${item.sourceType || 'official'}"></div>
+            <span class="news-source">${escHtml(item.source)}</span>
+            <span class="dot-sep"></span>
+            <span class="news-date">${formatDate(item.published_at)}</span>
+            <span class="arrow-icon">↗</span>
+          </div>
+        </a>`;
+    }
+
+    // ── SIGNAL CARD HTML ───────────────────────────────────────
+    function signalCardHTML(item) {
+      const icon = catIcons[item.category] || '📰';
+      const isRumor = item.is_rumor;
+
+      return `
+        <a href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer"
+           class="signal-card ${isRumor ? 'is-rumor' : ''} fade-in">
+          <div class="signal-icon">${icon}</div>
+          <div class="signal-content">
+            <div class="signal-title">${escHtml(item.title)}</div>
+            <div class="signal-meta">
+              <span class="signal-source">${escHtml(item.source)}</span>
+              <span class="dot-sep"></span>
+              <span class="signal-date">${formatDate(item.published_at)}</span>
+              ${isRumor ? '<span class="rumor-badge">Gerücht</span>' : ''}
+            </div>
+          </div>
+        </a>`;
+    }
+
+    // ── CLUSTER HTML ───────────────────────────────────────────
+    function clusterHTML(category, items) {
+      const icon = catIcons[category] || '📰';
+      const catClass = catMap[category] || 'company';
+      if (items.length === 0) return '';
+
+      return `
+        <div class="cluster">
+          <div class="cluster-header">
+            <span class="cluster-icon">${icon}</span>
+            <span class="cluster-label">${escHtml(category)}</span>
+            <div class="cluster-line"></div>
+            <span class="cluster-count">${items.length}</span>
+          </div>
+          ${items.map(newsItemHTML).join('')}
+        </div>`;
+    }
+
+    // ── RENDER NEWS VIEW ───────────────────────────────────────
+    function renderNewsView() {
+      const items = filteredItems();
+
+      if (items.length === 0) {
+        return renderEmpty();
+      }
+
+      let html = `
+        <div class="update-row">
+          <span class="update-label">Zuletzt aktualisiert</span>
+          <span class="update-time">${state.fetchedAt ? formatDateFull(state.fetchedAt) : '—'}</span>
+        </div>`;
+
+      if (state.activeFilter !== 'all') {
+        // Gefilterter View: direkte Liste
+        html += items.map(newsItemHTML).join('');
+      } else {
+        // Alle: nach Clustern gruppiert
+        const categories = [
+          'Übernahme / Gerüchte',
+          'Unternehmensnews',
+          'OOH / DOOH',
+          'Aktie / Markt',
+          'Jobs / Kultur',
+        ];
+
+        for (const cat of categories) {
+          const catItems = items.filter(i => i.category === cat);
+          if (catItems.length > 0) {
+            html += clusterHTML(cat, catItems);
+          }
+        }
+      }
+
+      if (state.dataSource === 'fallback') {
+        html += `<div class="data-note">⚠ Fallback-Daten · Keine Live-Verbindung</div>`;
+      }
+
+      mainContent.innerHTML = html;
+    }
+
+    // ── RENDER TOP SIGNALS VIEW ────────────────────────────────
+    function renderTopView() {
+      const top = state.items
+        .filter(i => i.priority <= 2)
+        .slice(0, 8);
+
+      let html = `
+        <div class="update-row">
+          <span class="update-label">Top-Signale</span>
+          <span class="update-time">${state.fetchedAt ? formatDateFull(state.fetchedAt) : '—'}</span>
+        </div>
+        <div>
+          <div class="section-title">Wichtigste Meldungen heute</div>
+          <div class="top-signals-grid">
+            ${top.length > 0 ? top.map(signalCardHTML).join('') : '<div class="empty-state">Keine Top-Signale verfügbar.</div>'}
+          </div>
+        </div>`;
+
+      const rumors = state.items.filter(i => i.is_rumor);
+      if (rumors.length > 0) {
+        html += `
+          <div>
+            <div class="section-title">⚡ Aktive Gerüchte / M&A-Signale</div>
+            <div class="top-signals-grid">
+              ${rumors.map(signalCardHTML).join('')}
+            </div>
+          </div>`;
+      }
+
+      mainContent.innerHTML = html;
+    }
+
+    // ── RENDER STATUS VIEW ─────────────────────────────────────
+    function renderStatusView() {
+      const cats = {};
+      for (const item of state.items) {
+        cats[item.category] = (cats[item.category] || 0) + 1;
+      }
+
+      const rumorCount = state.items.filter(i => i.is_rumor).length;
+      const sourceTypes = {};
+      for (const item of state.items) {
+        sourceTypes[item.sourceType] = (sourceTypes[item.sourceType] || 0) + 1;
+      }
+
+      mainContent.innerHTML = `
+        <div>
+          <div class="section-title">System-Status</div>
+          <div class="cluster">
+            <div class="news-item" style="cursor:default;">
+              <div class="news-title" style="font-size:12px;color:var(--text-2);">Datenstatus</div>
+              <div class="news-summary">${state.dataSource === 'fresh' ? '✅ Live-Daten' : state.dataSource === 'cache' ? '🔄 Aus Cache' : state.dataSource === 'stale' ? '⚠ Veraltete Daten' : '⚠ Fallback-Daten'}</div>
+              <div class="news-footer"><span class="news-date">${state.fetchedAt ? formatDateFull(state.fetchedAt) : 'Unbekannt'}</span></div>
+            </div>
+            <div class="news-item" style="cursor:default;">
+              <div class="news-title" style="font-size:12px;color:var(--text-2);">News-Übersicht</div>
+              <div class="news-summary">
+                ${state.items.length} Meldungen total · ${rumorCount} Gerüchte<br>
+                ${Object.entries(cats).map(([k,v]) => `${catIcons[k]||'·'} ${k}: ${v}`).join(' · ')}
+              </div>
+            </div>
+            <div class="news-item" style="cursor:default;">
+              <div class="news-title" style="font-size:12px;color:var(--text-2);">Quellen-Typen</div>
+              <div class="news-summary">
+                ${Object.entries(sourceTypes).map(([k,v]) => `${k}: ${v}`).join(' · ') || 'Keine Daten'}
+              </div>
+            </div>
+            <div class="news-item" style="cursor:default;">
+              <div class="news-title" style="font-size:12px;color:var(--text-2);">Automatischer Refresh</div>
+              <div class="news-summary">Mo–Fr · 12:00 + 16:00 Uhr MEZ<br>Manuelle Aktualisierung über ↻ oben rechts</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── RENDER LOADING ─────────────────────────────────────────
+    function renderLoading() {
+      mainContent.innerHTML = `
+        <div class="loading-state">
+          <div class="loader"></div>
+          <div class="loading-text">Lade aktuelle News…</div>
+        </div>`;
+    }
+
+    // ── RENDER EMPTY ───────────────────────────────────────────
+    function renderEmpty() {
+      mainContent.innerHTML = `<div class="empty-state">Keine News für diesen Filter verfügbar.</div>`;
+    }
+
+    // ── MAIN RENDER ────────────────────────────────────────────
+    function render() {
+      if (state.loading) return;
+
+      switch (state.activeView) {
+        case 'news':   renderNewsView(); break;
+        case 'top':    renderTopView();  break;
+        case 'status': renderStatusView(); break;
+      }
+    }
+
+    // ── SHOW ERROR ─────────────────────────────────────────────
+    function showError(msg, type = 'error') {
+      errorBanner.textContent = msg;
+      errorBanner.classList.add('visible');
+      if (type !== 'warn') {
+        errorBanner.style.color = 'var(--rose)';
+      } else {
+        errorBanner.style.color = 'var(--amber)';
+      }
+      setTimeout(() => errorBanner.classList.remove('visible'), 6000);
+    }
+
+    // ── ESC HTML ───────────────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ── FILTER PILLS ───────────────────────────────────────────
+    filterBar.addEventListener('click', (e) => {
+      const pill = e.target.closest('.signal-pill');
+      if (!pill) return;
+
+      filterBar.querySelectorAll('.signal-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      state.activeFilter = pill.dataset.cat;
+      state.activeView = 'news';
+
+      // Nav sync
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.nav-btn[data-view="news"]')?.classList.add('active');
+
+      render();
+    });
+
+    // ── BOTTOM NAV ─────────────────────────────────────────────
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.activeView = btn.dataset.view;
+        render();
+      });
+    });
+
+    // ── REFRESH BTN ────────────────────────────────────────────
+    refreshBtn.addEventListener('click', () => {
+      fetchNews(true);
+    });
+
+    // ── INIT ───────────────────────────────────────────────────
+    fetchNews();
+  </script>
+</body>
+</html>
