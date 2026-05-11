@@ -5,18 +5,6 @@
 [functions]
   node_bundler = "esbuild"
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
-
-# Scheduled refresh: 10:00 + 14:00 UTC = 12:00 + 16:00 MEZ (Winter)
-# Im Sommer (MESZ) = 12:00 + 16:00 MESZ → passt ebenfalls gut
-
-[[plugins]]
-  package = "@netlify/plugin-scheduled-functions"
-
-[functions."fetch-news"]
-  schedule = "0 10,14 * * 1-5"
-
 [[headers]]
   for = "/api/*"
   [headers.values]
