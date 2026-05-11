@@ -673,9 +673,9 @@
       renderLoading();
 
       try {
-        const url = force
-          ? `/api/news?t=${Date.now()}`
-          : '/api/news';
+       const url = force
+          ? `/.netlify/functions/api-news?t=${Date.now()}`
+          : '/.netlify/functions/api-news';
 
         const res = await fetch(url, {
           signal: AbortSignal.timeout(15000),
